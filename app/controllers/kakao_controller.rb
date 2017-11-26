@@ -8,7 +8,7 @@ class KakaoController < ApplicationController
   @@ticket = Ticket::Skyscanner.new
 
 
-  @@btnkeyboard = @@keyboard.getBtnKey(["서울출발","부산출발", "방콕도착", "하노이도착", "현재상태"])
+  @@btnkeyboard = @@keyboard.getBtnKey(["서울출발","부산출발", "방콕도착", "하노이도착", "현재상태", "출발"])
 
   def keyboard
     render json:  @@btnkeyboard
@@ -36,12 +36,24 @@ class KakaoController < ApplicationController
     # message=@@message.getMessage(parse.get_news(input))
     
     
-    if input=="서울출발"
-       @@ticket.setDeparture("서울")
+    
+     if input=="출발"
+      
        result = {
-          message: @@message.getMessage(@@ticket.seoul_search + @@ticket.getDeparture.to_s),
+          message: @@message.getMessage(@@ticket.start_search),
           keyboard:  @@btnkeyboard
         }
+     
+    end
+    
+    if input=="서울출발"
+      
+       @@ticket.setDeparture("서울")
+       result = {
+          message: @@message.getMessage(@@ticket.getDeparture + "출발"),
+          keyboard:  @@btnkeyboard
+        }
+     
     end
     
      if input=="부산출발"

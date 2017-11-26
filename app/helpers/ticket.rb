@@ -12,28 +12,32 @@ module Ticket
         
     @@departure=''
     @@arrival=''
-    
+    @@airport={"서울" => "ICN", "부산" => "PUS", "방콕" => "BKK", "하노이" =>"HAN"}
     
     def setArrival(arr)
-       @@arrival = arr 
+        p arr
+       @@arrival = @@airport[arr] 
     end
     
     def getArrival()
-       @@arrival 
+       @@arrival.to_s
     end
     
-    def setDeparture(departure)
-        @@departure=departure
+    def setDeparture(dep)
+        p dep
+        @@departure=@@airport[dep]
     end
     
     def getDeparture()
-        @@departure
+       @@departure.to_s
     end
  
     def getStatus
-        @@departure + "출발 " + @@arrival + "도착"
-    
+        status= @@departure.to_s + "출발 " + @@arrival.to_s + "도착"
+        status
     end
+    
+ 
   
     def search(dk,k,search_start, search_end, period_start, period_finish, limit, result)
     	array1=[]
@@ -132,18 +136,17 @@ module Ticket
     end
     
     
-    def seoul_search()
+    def start_search()
         
         headers = {
             "user-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36"
         }
- 
         
-        
-        @@departure="서울"
         array1=[]
     	min1=[]
-        url = "https://www.skyscanner.co.kr/dataservices/browse/v3/mvweb/KR/KRW/ko-KR/calendar/ICN/BKK/2017-12/2017-12/?profile=minimalmonthviewgrid&abvariant=GDT1606_ShelfShuffleOrSort:b|GDT1606_ShelfShuffleOrSort_V5:b|RTS2189_BrowseTrafficShift:b|RTS2189_BrowseTrafficShift_V8:b|rts_mbmd_anylegs:b|rts_mbmd_anylegs_V5:b|GDT1693_MonthViewSpringClean:b|GDT1693_MonthViewSpringClean_V13:b|GDT2195_RolloutMicroserviceIntegration:b|GDT2195_RolloutMicroserviceIntegration_V4:b"
+    	p @@departure
+    	p @@arrival
+        url = "https://www.skyscanner.co.kr/dataservices/browse/v3/mvweb/KR/KRW/ko-KR/calendar/#{@@departure}/#{@@arrival}/2017-12/2017-12/?profile=minimalmonthviewgrid&abvariant=GDT1606_ShelfShuffleOrSort:b|GDT1606_ShelfShuffleOrSort_V5:b|RTS2189_BrowseTrafficShift:b|RTS2189_BrowseTrafficShift_V8:b|rts_mbmd_anylegs:b|rts_mbmd_anylegs_V5:b|GDT1693_MonthViewSpringClean:b|GDT1693_MonthViewSpringClean_V13:b|GDT2195_RolloutMicroserviceIntegration:b|GDT2195_RolloutMicroserviceIntegration_V4:b"
     	result=JSON.parse(RestClient.get(url, headers))
     	search_start=1
     	search_end=30
@@ -155,7 +158,7 @@ module Ticket
             outbound = result['PriceGrids']['Grid'][0][j-1]['DirectOutboundPrice']
             inbound = result['PriceGrids']['Grid'][j-1+period][j-1]['DirectInboundPrice']
     		if  outbound && inbound && ((inbound + outbound) < limit)
-    		    array1.push(["서울","방콕","direct",j,j+period, period, (outbound+inbound)])
+    		    array1.push([@@departure,@@arrival,"direct",j,j+period, period, (outbound+inbound)])
     			min1.push(outbound+inbound)
     		end
         end #end of search_start
